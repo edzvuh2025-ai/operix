@@ -51,7 +51,6 @@ router.post("/groups/:groupId/staff", requireAuth, async (req, res) => {
       type: "staff_added",
       message: `Added staff member ${staff.robloxUsername}`,
       staffUsername: staff.robloxUsername,
-      
     });
     res.status(201).json(formatStaff(staff));
   } catch (err) {
@@ -96,7 +95,6 @@ router.patch("/groups/:groupId/staff/:staffId", requireAuth, async (req, res) =>
       type: "staff_updated",
       message: `Updated staff member ${staff.robloxUsername}`,
       staffUsername: staff.robloxUsername,
-      
     });
     res.json(formatStaff(staff));
   } catch (err) {
@@ -118,7 +116,6 @@ router.delete("/groups/:groupId/staff/:staffId", requireAuth, async (req, res) =
         type: "staff_deleted",
         message: `Removed staff member ${existing.robloxUsername}`,
         staffUsername: existing.robloxUsername,
-        
       });
     }
     await db.delete(staffTable).where(and(eq(staffTable.id, staffId), eq(staffTable.groupId, groupId)));

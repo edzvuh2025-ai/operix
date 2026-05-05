@@ -53,7 +53,6 @@ router.post("/groups/:groupId/sessions", requireAuth, async (req, res) => {
       type: "session_started",
       message: `${staffUsername} started a session on ${parsed.data.serverName}`,
       staffUsername: staffUsername || undefined,
-      
     });
     res.status(201).json(formatSession(session));
   } catch (err) {
@@ -83,7 +82,6 @@ router.post("/groups/:groupId/sessions/:sessionId/end", requireAuth, async (req,
       type: "session_ended",
       message: `${existing.staffUsername} ended session on ${existing.serverName} (${durationMinutes}m)`,
       staffUsername: existing.staffUsername || undefined,
-      
     });
     res.json(formatSession(session));
   } catch (err) {

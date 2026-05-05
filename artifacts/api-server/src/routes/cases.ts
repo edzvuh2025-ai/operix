@@ -50,7 +50,6 @@ router.post("/groups/:groupId/cases", requireAuth, async (req, res) => {
       type: "case_created",
       message: `Created case: ${c.title}`,
       staffUsername: c.staffUsername || undefined,
-      
     });
     res.status(201).json(formatCase(c));
   } catch (err) {
@@ -91,7 +90,6 @@ router.patch("/groups/:groupId/cases/:caseId", requireAuth, async (req, res) => 
       type: activityType,
       message: `${activityType === "case_closed" ? "Closed" : "Updated"} case: ${c.title}`,
       staffUsername: c.staffUsername || undefined,
-      
     });
     res.json(formatCase(c));
   } catch (err) {
