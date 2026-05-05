@@ -11,6 +11,9 @@ COPY . .
 # Install dependencies
 RUN pnpm install
 
+# Set PORT env var for build (required by mockup-sandbox vite.config)
+ENV PORT=3000
+
 # Build
 RUN pnpm run build
 
