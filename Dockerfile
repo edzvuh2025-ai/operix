@@ -11,6 +11,9 @@ COPY . .
 # Install dependencies
 RUN pnpm install
 
+# Set PORT env var for build (operix vite config reads it at build time)
+ENV PORT=3000
+
 # Build only production artifacts (skip mockup-sandbox which is dev-only)
 RUN pnpm run typecheck && \
     pnpm --filter @workspace/api-server run build && \
