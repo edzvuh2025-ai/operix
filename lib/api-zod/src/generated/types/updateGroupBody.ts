@@ -8,6 +8,7 @@
 
 export interface UpdateGroupBody {
   name?: string;
+  robloxGroupId?: string;
   description?: string;
   logoUrl?: string;
 }

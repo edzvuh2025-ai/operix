@@ -70,6 +70,7 @@ export const UpdateGroupParams = zod.object({
 
 export const UpdateGroupBody = zod.object({
   name: zod.string().optional(),
+  robloxGroupId: zod.string().optional(),
   description: zod.string().optional(),
   logoUrl: zod.string().optional(),
 });
