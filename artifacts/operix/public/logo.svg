@@ -1,0 +1,5 @@
+<svg width="200" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 8L28 20L16 32L4 20L16 8Z" fill="#3B82F6"/>
+  <path d="M24 8L36 20L24 32" stroke="#3B82F6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="50" y="27" font-family="Inter, sans-serif" font-weight="700" font-size="22" fill="#F8FAFC" letter-spacing="-0.05em">OPERIX</text>
+</svg>
