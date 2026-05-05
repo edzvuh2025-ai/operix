@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
+import path from "path";
 import { clerkMiddleware } from "@clerk/express";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
 import {
@@ -49,5 +50,14 @@ app.use(
 );
 
 app.use("/api", router);
+
+// Serve the built frontend as static files
+const distPath = path.join(process.cwd(), "artifacts/operix/dist");
+app.use(express.static(distPath));
+
+// SPA fallback: route non-API requests to index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
 
 export default app;
