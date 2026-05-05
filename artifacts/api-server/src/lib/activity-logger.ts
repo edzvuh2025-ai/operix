@@ -1,4 +1,4 @@
-import { db, activityLogTable } from "@workspace/db";
+import { db, activityTable } from "@workspace/db";
 
 export type ActivityType = 
   | "staff_added"
@@ -37,7 +37,7 @@ export async function logActivity({
   metadata = {},
 }: LogActivityParams): Promise<void> {
   try {
-    await db.insert(activityLogTable).values({
+    await db.insert(activityTable).values({
       groupId,
       type,
       description,
