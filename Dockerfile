@@ -11,11 +11,10 @@ COPY . .
 # Install dependencies
 RUN pnpm install
 
-# Set PORT env var for build (required by mockup-sandbox vite.config)
-ENV PORT=3000
-
-# Build
-RUN pnpm run build
+# Build only production artifacts (skip mockup-sandbox which is dev-only)
+RUN pnpm run typecheck && \
+    pnpm --filter @workspace/api-server run build && \
+    pnpm --filter @workspace/operix run build
 
 # Expose ports
 EXPOSE 8080 5173
