@@ -51,9 +51,9 @@ router.post("/groups/:groupId/sessions", requireAuth, async (req, res) => {
     await logActivity({
       groupId,
       type: "session_started",
-      description: `${staffUsername} started a session on ${parsed.data.serverName}`,
-      targetUsername: staffUsername || undefined,
-      metadata: { sessionId: session.id, serverName: parsed.data.serverName },
+      message: `${staffUsername} started a session on ${parsed.data.serverName}`,
+      staffUsername: staffUsername || undefined,
+      
     });
     res.status(201).json(formatSession(session));
   } catch (err) {
@@ -81,9 +81,9 @@ router.post("/groups/:groupId/sessions/:sessionId/end", requireAuth, async (req,
     await logActivity({
       groupId,
       type: "session_ended",
-      description: `${existing.staffUsername} ended session on ${existing.serverName} (${durationMinutes}m)`,
-      targetUsername: existing.staffUsername || undefined,
-      metadata: { sessionId: session.id, durationMinutes, serverName: existing.serverName },
+      message: `${existing.staffUsername} ended session on ${existing.serverName} (${durationMinutes}m)`,
+      staffUsername: existing.staffUsername || undefined,
+      
     });
     res.json(formatSession(session));
   } catch (err) {

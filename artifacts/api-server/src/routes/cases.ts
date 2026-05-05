@@ -48,9 +48,9 @@ router.post("/groups/:groupId/cases", requireAuth, async (req, res) => {
     await logActivity({
       groupId,
       type: "case_created",
-      description: `Created case: ${c.title}`,
-      targetUsername: c.staffUsername || undefined,
-      metadata: { caseId: c.id, severity: c.severity },
+      message: `Created case: ${c.title}`,
+      staffUsername: c.staffUsername || undefined,
+      
     });
     res.status(201).json(formatCase(c));
   } catch (err) {
@@ -89,9 +89,9 @@ router.patch("/groups/:groupId/cases/:caseId", requireAuth, async (req, res) => 
     await logActivity({
       groupId,
       type: activityType,
-      description: `${activityType === "case_closed" ? "Closed" : "Updated"} case: ${c.title}`,
-      targetUsername: c.staffUsername || undefined,
-      metadata: { caseId: c.id, status: c.status },
+      message: `${activityType === "case_closed" ? "Closed" : "Updated"} case: ${c.title}`,
+      staffUsername: c.staffUsername || undefined,
+      
     });
     res.json(formatCase(c));
   } catch (err) {

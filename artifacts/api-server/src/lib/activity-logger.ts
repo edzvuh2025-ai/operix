@@ -11,17 +11,14 @@ export type ActivityType =
   | "session_ended"
   | "rule_created"
   | "rule_updated"
-  | "rule_deleted"
-  | "alert_created"
-  | "alert_resolved";
+  | "rule_deleted";
 
 interface LogActivityParams {
   groupId: number;
   type: ActivityType;
-  description: string;
-  actorUsername?: string | null;
-  targetUsername?: string | null;
-  metadata?: Record<string, any>;
+  message: string;
+  staffUsername?: string | null;
+  referenceId?: number;
 }
 
 /**
@@ -31,20 +28,17 @@ interface LogActivityParams {
 export async function logActivity({
   groupId,
   type,
-  description,
-  actorUsername = null,
-  targetUsername = null,
-  metadata = {},
+  message,
+  staffUsername = null,
+  referenceId,
 }: LogActivityParams): Promise<void> {
   try {
     await db.insert(activityTable).values({
       groupId,
       type,
-      description,
-      actorUsername,
-      targetUsername,
-      metadata: metadata || {},
-      createdAt: new Date(),
+      message,
+      staffUsername,
+      referenceId,
     });
   } catch (err) {
     // Log but don't fail the request if activity logging fails

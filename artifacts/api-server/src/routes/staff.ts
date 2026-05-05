@@ -49,9 +49,9 @@ router.post("/groups/:groupId/staff", requireAuth, async (req, res) => {
     await logActivity({
       groupId,
       type: "staff_added",
-      description: `Added staff member ${staff.robloxUsername}`,
-      targetUsername: staff.robloxUsername,
-      metadata: { staffId: staff.id, role: staff.role },
+      message: `Added staff member ${staff.robloxUsername}`,
+      staffUsername: staff.robloxUsername,
+      
     });
     res.status(201).json(formatStaff(staff));
   } catch (err) {
@@ -94,9 +94,9 @@ router.patch("/groups/:groupId/staff/:staffId", requireAuth, async (req, res) =>
     await logActivity({
       groupId,
       type: "staff_updated",
-      description: `Updated staff member ${staff.robloxUsername}`,
-      targetUsername: staff.robloxUsername,
-      metadata: { staffId: staff.id, changes: parsed.data },
+      message: `Updated staff member ${staff.robloxUsername}`,
+      staffUsername: staff.robloxUsername,
+      
     });
     res.json(formatStaff(staff));
   } catch (err) {
@@ -116,9 +116,9 @@ router.delete("/groups/:groupId/staff/:staffId", requireAuth, async (req, res) =
       await logActivity({
         groupId,
         type: "staff_deleted",
-        description: `Removed staff member ${existing.robloxUsername}`,
-        targetUsername: existing.robloxUsername,
-        metadata: { staffId: existing.id, role: existing.role },
+        message: `Removed staff member ${existing.robloxUsername}`,
+        staffUsername: existing.robloxUsername,
+        
       });
     }
     await db.delete(staffTable).where(and(eq(staffTable.id, staffId), eq(staffTable.groupId, groupId)));
