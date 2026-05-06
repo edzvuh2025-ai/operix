@@ -11,14 +11,17 @@ COPY . .
 # Install dependencies
 RUN pnpm install
 
-# Build only the production artifacts (api-server + operix frontend)
-# PORT and BASE_PATH are read by vite.config.ts at build time - defaults are now in config
+# Set PORT env var for build (operix vite config reads it at build time)
+ENV PORT=3000
+ENV BASE_PATH=/
+
+# Build only production artifacts (skip mockup-sandbox which is dev-only)
 RUN pnpm run typecheck && \
     pnpm --filter @workspace/api-server run build && \
     pnpm --filter @workspace/operix run build
 
-# Expose port
+# Expose only the API server port
 EXPOSE 8080
 
-# Start the API server (also serves the built React frontend as static files)
-CMD ["node", "--enable-source-maps", "./artifacts/api-server/dist/index.mjs"]
+# Start only the API server (which serves static frontend + API routes)
+CMD ["pnpm", "--filter", "@workspace/api-server", "run", "start"]

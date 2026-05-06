@@ -51,13 +51,13 @@ app.use(
 
 app.use("/api", router);
 
-// Serve the built frontend as static files
-const distPath = path.join(process.cwd(), "artifacts/operix/dist");
-app.use(express.static(distPath));
+// Serve static files from the built operix frontend
+const publicPath = path.join(process.cwd(), "artifacts/operix/dist");
+app.use(express.static(publicPath));
 
-// SPA fallback: route non-API requests to index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
+// SPA fallback: serve index.html for all non-API routes
+app.get("/:path(.*)", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 export default app;
