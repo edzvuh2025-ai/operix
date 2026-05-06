@@ -55,9 +55,8 @@ app.use("/api", router);
 const publicPath = path.join(process.cwd(), "artifacts/operix/dist");
 app.use(express.static(publicPath));
 
-// SPA fallback: serve index.html for all non-API routes
-// Express 5 requires /:path* instead of /:path(.*) 
-app.get("/:path*", (req, res) => {
+// SPA fallback: serve index.html for all non-API routes (no path pattern in Express 5)
+app.use((req, res) => {
   res.sendFile(path.join(publicPath, "index.html"));
 });
 
