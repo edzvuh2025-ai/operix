@@ -8,8 +8,8 @@ RUN npm install -g pnpm@9
 # Copy files
 COPY . .
 
-# Install dependencies
-RUN pnpm install
+# Install dependencies (generate lockfile if needed)
+RUN pnpm install --no-frozen-lockfile
 
 # Set PORT env var for build (operix vite config reads it at build time)
 ENV PORT=3000
