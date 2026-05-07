@@ -6,10 +6,10 @@ COPY . .
 
 RUN npm install -g pnpm
 
-# Allow build scripts to run, then install
-RUN pnpm install --no-frozen-lockfile --allow-scripts
+# Install with ignore-scripts disabled (allow build scripts)
+RUN pnpm install --no-frozen-lockfile --config.ignore-scripts=false
 
-# Build the app
+# Build both frontend and backend
 RUN pnpm run build
 
 EXPOSE 8080
