@@ -1,8 +1,8 @@
-import express, {Request, Response, NextFunction} from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import path from "path";
-import {fileURLToPath} from "url";
-import {ClerkExpressWithAuth} from "@clerk/express";
+import { fileURLToPath } from "url";
+import { clerkMiddleware } from "@clerk/express";
 import healthRoute from "./routes/health.js";
 import groupsRoute from "./routes/groups.js";
 import staffRoute from "./routes/staff.js";
@@ -10,7 +10,7 @@ import casesRoute from "./routes/cases.js";
 import sessionsRoute from "./routes/sessions.js";
 import activityRoute from "./routes/activity.js";
 import settingsRoute from "./routes/settings.js";
-import {errorHandler} from "./middleware/errorHandler.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(ClerkExpressWithAuth());
+app.use(clerkMiddleware());
 
 app.use("/api/health", healthRoute);
 app.use("/api/groups", groupsRoute);

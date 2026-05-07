@@ -17,5 +17,12 @@
     "typescript": "^5.3.3",
     "drizzle-kit": "^0.20.11",
     "@types/node": "^20.10.6"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   }
 }

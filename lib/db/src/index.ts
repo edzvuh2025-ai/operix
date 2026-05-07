@@ -1,2 +1,2 @@
-export {client} from "./client";
-export {groups, staff, cases, sessions, activityLog} from "./schema";
+export { client } from "./client.js";
+export { groups, staff, cases, sessions, activityLog } from "./schema.js";

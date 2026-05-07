@@ -1,6 +1,8 @@
-import {Request, Response, NextFunction} from "express";
+import { Request, Response, NextFunction } from "express";
+import { getAuth } from "@clerk/express";
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!req.auth?.userId) return res.status(401).json({error: "Unauthorized"});
+  const { userId } = getAuth(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
   next();
 }
