@@ -8,8 +8,11 @@ COPY . .
 # Install pnpm
 RUN npm install -g pnpm@latest
 
+# Create .npmrc to allow build scripts
+RUN echo "ignore-scripts=false" > .npmrc
+
 # Install dependencies
-RUN pnpm install --no-frozen-lockfile
+RUN PNPM_IGNORE_SCRIPTS=false pnpm install --no-frozen-lockfile
 
 # Build all workspaces
 RUN pnpm build
