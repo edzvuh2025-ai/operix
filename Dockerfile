@@ -2,16 +2,16 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy everything
+# Copy all source
 COPY . .
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@latest
 
-# Install all dependencies (will respect .npmrc)
+# Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build
+# Build all workspaces
 RUN pnpm build
 
 # Expose port
