@@ -2,16 +2,20 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+# Copy everything
 COPY . .
 
+# Install pnpm
 RUN npm install -g pnpm
 
-# Install with ignore-scripts disabled (allow build scripts)
-RUN pnpm install --no-frozen-lockfile --config.ignore-scripts=false
+# Install all dependencies (will respect .npmrc)
+RUN pnpm install --no-frozen-lockfile
 
-# Build both frontend and backend
-RUN pnpm run build
+# Build
+RUN pnpm build
 
+# Expose port
 EXPOSE 8080
 
+# Start API server
 CMD ["pnpm", "start"]
