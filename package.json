@@ -13,5 +13,12 @@
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=8.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@clerk/shared",
+      "es5-ext",
+      "esbuild"
+    ]
   }
 }
