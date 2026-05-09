@@ -35,13 +35,22 @@ app.use(errorHandler);
 
 // Serve static files from frontend build
 const frontendPath = path.join(__dirname, "../../artifacts/operix/dist");
-console.log(`📁 Serving static files from: ${frontendPath}`);
-console.log(`✓ Static files exist: ${fs.existsSync(frontendPath)}`);
+const indexPath = path.join(frontendPath, "index.html");
+
+console.log(`📁 Frontend path: ${frontendPath}`);
+console.log(`✓ Directory exists: ${fs.existsSync(frontendPath)}`);
+console.log(`✓ index.html exists: ${fs.existsSync(indexPath)}`);
+
+// Serve static files
 app.use(express.static(frontendPath));
 
-// SPA fallback
+// SPA fallback - serve index.html for all other routes
 app.use((req: Request, res: Response) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).json({ error: "Frontend not found", path: frontendPath, indexPath });
+  }
 });
 
 const PORT = process.env.PORT || 3001;
