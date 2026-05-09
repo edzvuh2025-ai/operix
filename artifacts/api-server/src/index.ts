@@ -34,7 +34,7 @@ app.use("/api/groups/:groupId/settings", settingsRoute);
 app.use(errorHandler);
 
 // Serve static files from frontend build
-const frontendPath = path.join(__dirname, "../../artifacts/operix/dist");
+const frontendPath = path.join(__dirname, "../../operix/dist");
 const indexPath = path.join(frontendPath, "index.html");
 
 console.log(`📁 Frontend path: ${frontendPath}`);
