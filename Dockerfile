@@ -4,20 +4,28 @@ FROM node:22-alpine
 ARG VITE_CLERK_PUBLISHABLE_KEY
 ARG VITE_CLERK_PROXY_URL
 
-# Set them as environment variables for Vite
+# Set environment variables for the build stage
 ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
 ENV VITE_CLERK_PROXY_URL=$VITE_CLERK_PROXY_URL
 
+# Install pnpm
+RUN npm install -g pnpm
+
 WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npm install -g pnpm@10
-
-RUN pnpm install --no-frozen-lockfile
-
+# Build the frontend and compile the API
 RUN pnpm build
 
-EXPOSE 8080
+# Run database migrations
+RUN pnpm -F @operix/db run migrate
+
+EXPOSE 3001
 
 CMD ["pnpm", "start"]
