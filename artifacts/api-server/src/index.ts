@@ -1,3 +1,4 @@
+import fs from "fs";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import path from "path";
@@ -34,6 +35,8 @@ app.use(errorHandler);
 
 // Serve static files from frontend build
 const frontendPath = path.join(__dirname, "../../artifacts/operix/dist");
+console.log(`📁 Serving static files from: ${frontendPath}`);
+console.log(`✓ Static files exist: ${fs.existsSync(frontendPath)}`);
 app.use(express.static(frontendPath));
 
 // SPA fallback
