@@ -18,9 +18,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(clerkMiddleware());
 
+// Health route before auth middleware so healthchecks bypass Clerk
 app.use("/api/health", healthRoute);
+
+app.use(clerkMiddleware());
 app.use("/api/groups", groupsRoute);
 app.use("/api/groups/:groupId/staff", staffRoute);
 app.use("/api/groups/:groupId/cases", casesRoute);
