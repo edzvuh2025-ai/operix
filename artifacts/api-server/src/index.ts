@@ -31,7 +31,7 @@ app.use("/api/groups/:groupId/settings", settingsRoute);
 app.use(errorHandler);
 
 // Serve static files from frontend build
-const frontendPath = path.join(__dirname, "../../artifacts/operix/dist");
+const frontendPath = path.join(__dirname, "../../operix/dist");
 app.use(express.static(frontendPath));
 
 // SPA fallback
