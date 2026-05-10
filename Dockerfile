@@ -1,45 +1,17 @@
 FROM node:22-alpine
 
-# Accept build arguments from Railway
-ARG VITE_CLERK_PUBLISHABLE_KEY
-ARG VITE_CLERK_PROXY_URL
-
-# Set environment variables for the build
-ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
-ENV VITE_CLERK_PROXY_URL=$VITE_CLERK_PROXY_URL
-
 WORKDIR /app
+COPY . .
 
-RUN npm install -g pnpm
+# Install pnpm
+RUN npm install -g pnpm@10
 
-# Copy monorepo files (removed pnpm-lock.yaml as it doesn't exist)
-COPY package.json pnpm-workspace.yaml ./
+# Install dependencies
+RUN pnpm install --no-frozen-lockfile
 
-# Copy all workspaces
-COPY lib ./lib
-COPY artifacts ./artifacts
+# Build (env vars from Railway's build context)
+ENV NODE_ENV=production
+RUN pnpm build
 
-# Install dependencies without running build scripts first
-RUN pnpm install --no-frozen-lockfile --no-scripts
-
-# Allow build scripts and rebuild
-RUN pnpm rebuild
-
-# Build the database migrations
-RUN pnpm -F @operix/db run build
-
-# Run database migrations
-RUN pnpm -F @operix/db run migrate
-
-# Build the Vite frontend
-RUN pnpm -F @operix/operix run build
-
-# Build the API server
-RUN pnpm -F @operix/api-server run build
-
-# Remove development dependencies
-RUN pnpm prune --prod
-
-EXPOSE 3000
-
-CMD ["pnpm", "-F", "@operix/api-server", "start"]
+# Start the API server (which serves frontend)
+CMD ["pnpm", "--filter=@operix/api-server", "start"]
