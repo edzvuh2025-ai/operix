@@ -1,6 +1,6 @@
-import { useNavigate } from "wouter";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAuth, SignUpButton, SignInButton } from "@clerk/react";
+import { useAuth, SignUpButton, SignInButton } from "@clerk/clerk-react";
 import { useEffect } from "react";
 
 export default function LandingPage() {
@@ -11,7 +11,7 @@ export default function LandingPage() {
     if (!isLoaded) return;
 
     if (isSignedIn) {
-      navigate("/dashboard");
+      navigate("/app/onboarding");
     }
   }, [isSignedIn, isLoaded, navigate]);
 
@@ -31,7 +31,7 @@ export default function LandingPage() {
                 Sign In
               </Button>
             </SignInButton>
-            <SignUpButton mode="modal" afterSignUpUrl="/onboarding">
+            <SignUpButton mode="modal" afterSignUpUrl="/app/onboarding">
               <Button className="bg-blue-600 hover:bg-blue-700">
                 Get Started
               </Button>
@@ -51,7 +51,7 @@ export default function LandingPage() {
             Manage your Roblox group with powerful tools for staff management, moderation, analytics, and automation.
           </p>
           <div className="flex gap-4 justify-center">
-            <SignUpButton mode="modal" afterSignUpUrl="/onboarding">
+            <SignUpButton mode="modal" afterSignUpUrl="/app/onboarding">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
                 Start Free
               </Button>
@@ -136,7 +136,7 @@ export default function LandingPage() {
           <p className="text-xl text-slate-400 mb-8">
             Join thousands of Roblox group managers using Operix to streamline their operations.
           </p>
-          <SignUpButton mode="modal" afterSignUpUrl="/onboarding">
+          <SignUpButton mode="modal" afterSignUpUrl="/app/onboarding">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
               Get Started Free
             </Button>
