@@ -22,5 +22,5 @@ ENV NODE_ENV=production
 # Build all packages
 RUN pnpm build
 
-# Start the API server
-CMD ["pnpm", "--filter=@operix/api-server", "start"]
+# Run database migrations and start the API server
+CMD sh -c "pnpm --filter=@operix/db run migrate && pnpm --filter=@operix/api-server start"

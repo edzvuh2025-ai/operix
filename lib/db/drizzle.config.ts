@@ -1,2 +1,2 @@
 import {defineConfig} from "drizzle-kit";
-export default defineConfig({schema: "./src/schema.ts",out: "./drizzle",driver: "postgresql",dbCredentials: {connectionString: process.env.DATABASE_URL || ""}});
+export default defineConfig({schema: "./src/schema.ts",out: "./drizzle",driver: "pg",dbCredentials: {connectionString: process.env.DATABASE_URL || ""}});

@@ -64,7 +64,7 @@ export default function OnboardingPage() {
         )}
 
         {!showForm ? (
-          <Button onClick={() => setShowForm(true)} className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-lg">
+          <Button onClick={() => setShowForm(true)} size="lg" variant="primary" className="w-full py-3 text-lg">
             Create New Group
           </Button>
         ) : (
@@ -88,7 +88,7 @@ export default function OnboardingPage() {
                   required
                 />
                 <div className="flex gap-2">
-                  <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700" disabled={creating}>
+                  <Button type="submit" variant="primary" className="flex-1" disabled={creating}>
                     {creating ? 'Creating...' : 'Create'}
                   </Button>
                   <Button type="button" onClick={() => setShowForm(false)} variant="secondary" className="flex-1">
