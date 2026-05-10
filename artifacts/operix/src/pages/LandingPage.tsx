@@ -1,116 +1,155 @@
-import { SignUpButton, SignInButton, useAuth } from '@clerk/clerk-react'
+import { useNavigate } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useAuth, SignUpButton, SignInButton } from "@clerk/react";
+import { useEffect } from "react";
 
 export default function LandingPage() {
-  const { isSignedIn } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth();
+  const navigate = useNavigate();
 
-  if (isSignedIn) {
-    // User is logged in, should have been redirected by App.tsx routing
-    // This shouldn't happen, but fallback to dashboard
-    window.location.href = '/dashboard'
-    return null
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (isSignedIn) {
+      navigate("/dashboard");
+    }
+  }, [isSignedIn, isLoaded, navigate]);
+
+  if (!isLoaded) {
+    return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#08090d] to-[#0f1117] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Navigation */}
-      <nav className="border-b border-[#1e2028] backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-            Operix
-          </div>
-          <div className="flex gap-4">
+      <nav className="fixed top-0 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-700 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold text-blue-400">Operix</div>
+          <div className="flex gap-3">
             <SignInButton mode="modal">
-              <button className="px-4 py-2 border border-[#3b82f6] text-[#3b82f6] rounded-lg hover:bg-[#3b82f6]/10 transition">
+              <Button variant="ghost" className="text-slate-300 hover:text-white">
                 Sign In
-              </button>
+              </Button>
             </SignInButton>
-            <SignUpButton mode="modal" redirectUrl="/onboarding">
-              <button className="px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
-                Sign Up
-              </button>
+            <SignUpButton mode="modal" afterSignUpUrl="/onboarding">
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Get Started
+              </Button>
             </SignUpButton>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-          The Operating System for <span className="text-[#3b82f6]">Roblox Groups</span>
-        </h1>
-        <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-          Manage your Roblox group with powerful tools for automation, analytics, and team collaboration
-        </p>
-        <div className="flex gap-4 justify-center">
-          <SignUpButton mode="modal" redirectUrl="/onboarding">
-            <button className="px-8 py-6 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition text-lg font-semibold">
-              Get Started Free
-            </button>
-          </SignUpButton>
+      <section className="pt-32 pb-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            The Operating System for{" "}
+            <span className="text-blue-400">Roblox Groups</span>
+          </h1>
+          <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
+            Manage your Roblox group with powerful tools for staff management, moderation, analytics, and automation.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <SignUpButton mode="modal" afterSignUpUrl="/onboarding">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
+                Start Free
+              </Button>
+            </SignUpButton>
+            <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800 px-8">
+              Learn More
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-2">Team Management</h3>
-            <p className="text-gray-400">Manage roles, permissions, and team members efficiently</p>
-          </div>
-          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-2">Activity Logging</h3>
-            <p className="text-gray-400">Track all group activities with detailed audit logs</p>
-          </div>
-          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-6">
-            <h3 className="text-xl font-bold mb-2">Analytics</h3>
-            <p className="text-gray-400">Get insights into group performance and member engagement</p>
+      <section className="py-20 px-4 bg-slate-800/50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold text-center text-white mb-12">
+            Powerful Features for Group Managers
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Feature 1 */}
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 hover:border-blue-400 transition">
+              <div className="text-blue-400 text-3xl mb-4">👥</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Staff Management</h3>
+              <p className="text-slate-400">
+                Organize and manage your staff hierarchy with role-based permissions and activity tracking.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 hover:border-blue-400 transition">
+              <div className="text-blue-400 text-3xl mb-4">🛡️</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Moderation Tools</h3>
+              <p className="text-slate-400">
+                Advanced moderation features to keep your group safe and maintain community standards.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 hover:border-blue-400 transition">
+              <div className="text-blue-400 text-3xl mb-4">📊</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Analytics & Insights</h3>
+              <p className="text-slate-400">
+                Track group activity, member engagement, and key metrics in real-time dashboards.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 hover:border-blue-400 transition">
+              <div className="text-blue-400 text-3xl mb-4">⚙️</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Automation Rules</h3>
+              <p className="text-slate-400">
+                Create custom automation rules to handle repetitive tasks and improve efficiency.
+              </p>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 hover:border-blue-400 transition">
+              <div className="text-blue-400 text-3xl mb-4">🔔</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Real-time Notifications</h3>
+              <p className="text-slate-400">
+                Stay updated with real-time notifications for important group events and activities.
+              </p>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-6 hover:border-blue-400 transition">
+              <div className="text-blue-400 text-3xl mb-4">🔐</div>
+              <h3 className="text-xl font-semibold text-white mb-2">Enterprise Security</h3>
+              <p className="text-slate-400">
+                Bank-level security with encryption, audit logs, and permission controls.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-3xl font-bold text-center mb-12">Pricing</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-8">
-            <h3 className="text-2xl font-bold mb-4">Free</h3>
-            <p className="text-3xl font-bold text-[#3b82f6] mb-6">$0</p>
-            <ul className="space-y-3 text-gray-400 mb-8">
-              <li>✓ Basic group management</li>
-              <li>✓ Up to 5 team members</li>
-              <li>✓ Activity logging</li>
-            </ul>
-            <SignUpButton mode="modal" redirectUrl="/onboarding">
-              <button className="w-full px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
-                Get Started
-              </button>
-            </SignUpButton>
-          </div>
-          <div className="bg-[#0f1117] border border-[#3b82f6] rounded-lg p-8">
-            <h3 className="text-2xl font-bold mb-4">Pro</h3>
-            <p className="text-3xl font-bold text-[#3b82f6] mb-6">$9.99<span className="text-lg text-gray-400">/month</span></p>
-            <ul className="space-y-3 text-gray-400 mb-8">
-              <li>✓ Everything in Free</li>
-              <li>✓ Unlimited team members</li>
-              <li>✓ Advanced analytics</li>
-              <li>✓ Priority support</li>
-            </ul>
-            <SignUpButton mode="modal" redirectUrl="/onboarding">
-              <button className="w-full px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
-                Upgrade to Pro
-              </button>
-            </SignUpButton>
-          </div>
+      {/* CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">
+            Ready to Transform Your Group Management?
+          </h2>
+          <p className="text-xl text-slate-400 mb-8">
+            Join thousands of Roblox group managers using Operix to streamline their operations.
+          </p>
+          <SignUpButton mode="modal" afterSignUpUrl="/onboarding">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
+              Get Started Free
+            </Button>
+          </SignUpButton>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#1e2028] py-8 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+      <footer className="border-t border-slate-700 bg-slate-900/50 py-8 px-4">
+        <div className="max-w-6xl mx-auto text-center text-slate-500 text-sm">
           <p>&copy; 2024 Operix. All rights reserved.</p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
