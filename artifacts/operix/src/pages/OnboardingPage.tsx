@@ -27,7 +27,7 @@ export default function OnboardingPage() {
     setCreating(true);
     try {
       const group = await api.groups.create({ name: form.name, robloxId: parseInt(form.robloxId) });
-      navigate(`/dashboard/${group.id}`);
+      navigate(`/app/dashboard/${group.id}`);
     } catch (e: any) {
       alert('Error: ' + e.message);
     } finally {
@@ -50,7 +50,7 @@ export default function OnboardingPage() {
             <h2 className="text-xl font-semibold mb-4">Your Groups</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
               {groups.map((group: any) => (
-                <Card key={group.id} className="cursor-pointer hover:border-blue-500 transition-colors" onClick={() => navigate(`/dashboard/${group.id}`)}>
+                <Card key={group.id} className="cursor-pointer hover:border-blue-500 transition-colors" onClick={() => navigate(`/app/dashboard/${group.id}`)}>
                   <CardHeader>
                     <CardTitle>{group.name}</CardTitle>
                   </CardHeader>
