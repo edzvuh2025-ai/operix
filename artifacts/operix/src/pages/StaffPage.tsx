@@ -1,124 +1,160 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
-import { Modal } from '@/components/ui/Modal';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Badge } from '@/components/ui/Badge';
-import { Trash2, Plus, Users } from 'lucide-react';
-import { api } from '@/lib/api';
+import { useState } from "react";
+import { Link } from "wouter";
+import { GroupProvider, useGroupContext } from "@/lib/group-context";
+import { MainLayout } from "@/components/layout/main-layout";
+import { useListStaff, useCreateStaffMember, getListStaffQueryKey } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Plus, ChevronRight, Clock, ShieldAlert } from "lucide-react";
 
-export default function StaffPage() {
-  const { groupId } = useParams<{ groupId: string }>();
-  const [staff, setStaff] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ robloxId: '', username: '', role: '' });
+const STATUS_STYLE: Record<string, string> = {
+  active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  inactive: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+  flagged: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  suspended: "bg-red-500/10 text-red-400 border-red-500/20",
+};
 
-  useEffect(() => {
-    api.staff.list(groupId!).then(setStaff).finally(() => setLoading(false));
-  }, [groupId]);
+const FADE_UP = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } };
+const STAGGER = { hidden: {}, show: { transition: { staggerChildren: 0.04 } } };
 
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const newStaff = await api.staff.create(groupId!, {
-        robloxId: parseInt(form.robloxId),
-        username: form.username,
-        role: form.role,
-      });
-      setStaff([...staff, newStaff]);
-      setForm({ robloxId: '', username: '', role: '' });
-      setShowModal(false);
-    } catch (e: any) {
-      alert('Error: ' + e.message);
-    }
+function StatusBadge({ status }: { status: string }) {
+  return <span className={`text-xs px-2 py-0.5 rounded-full border font-medium capitalize ${STATUS_STYLE[status] ?? STATUS_STYLE.inactive}`}>{status}</span>;
+}
+
+function AddStaffDialog({ groupId, onClose }: { groupId: number; onClose: () => void }) {
+  const [username, setUsername] = useState("");
+  const [rank, setRank] = useState("");
+  const [role, setRole] = useState("staff");
+  const qc = useQueryClient();
+  const create = useCreateStaffMember();
+
+  const handleSubmit = () => {
+    if (!username) return;
+    create.mutate({ groupId, data: { robloxUsername: username, rank, role: role as any } }, {
+      onSuccess: () => { qc.invalidateQueries({ queryKey: getListStaffQueryKey(groupId) }); onClose(); },
+    });
   };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('Remove this staff member?')) return;
-    try {
-      await api.staff.delete(groupId!, id);
-      setStaff(staff.filter((s) => s.id !== id));
-    } catch (e: any) {
-      alert('Error: ' + e.message);
-    }
-  };
-
-  if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Staff Members</h1>
-        <Button onClick={() => setShowModal(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Staff
+    <DialogContent>
+      <DialogHeader><DialogTitle>Add Staff Member</DialogTitle></DialogHeader>
+      <div className="space-y-4 py-2">
+        <div><label className="text-sm font-medium mb-1.5 block">Roblox Username</label><Input placeholder="e.g. Builderman" value={username} onChange={e => setUsername(e.target.value)} /></div>
+        <div><label className="text-sm font-medium mb-1.5 block">Rank</label><Input placeholder="e.g. Senior Moderator" value={rank} onChange={e => setRank(e.target.value)} /></div>
+        <div><label className="text-sm font-medium mb-1.5 block">Role</label>
+          <Select value={role} onValueChange={setRole}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="hr">HR</SelectItem>
+              <SelectItem value="moderator">Moderator</SelectItem>
+              <SelectItem value="staff">Staff</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSubmit} disabled={create.isPending || !username}>
+          {create.isPending ? "Adding..." : "Add Member"}
         </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
+}
+
+function StaffContent() {
+  const { activeGroup } = useGroupContext();
+  const groupId = activeGroup?.id ?? 0;
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [addOpen, setAddOpen] = useState(false);
+
+  const { data: staff = [], isLoading } = useListStaff(groupId, {}, { query: { enabled: !!groupId, queryKey: getListStaffQueryKey(groupId) } });
+
+  const filtered = staff.filter(s =>
+    s.robloxUsername.toLowerCase().includes(search.toLowerCase()) &&
+    (statusFilter === "all" || s.status === statusFilter)
+  );
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Staff Directory</h1>
+          <p className="text-muted-foreground text-sm mt-1">{staff.length} members</p>
+        </div>
+        <Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="h-4 w-4" /> Add Member</Button>
       </div>
 
-      {staff.length === 0 ? (
-        <Card>
-          <EmptyState icon={Users} title="No staff yet" description="Add your first staff member to get started" />
-        </Card>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#1e2028]">
-                <th className="text-left py-3 px-4 font-semibold">Username</th>
-                <th className="text-left py-3 px-4 font-semibold">Role</th>
-                <th className="text-left py-3 px-4 font-semibold">Roblox ID</th>
-                <th className="text-left py-3 px-4 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {staff.map((s) => (
-                <tr key={s.id} className="border-b border-[#1e2028] hover:bg-[#0f1117]">
-                  <td className="py-3 px-4">{s.username}</td>
-                  <td className="py-3 px-4"><Badge variant={s.role === 'Owner' ? 'danger' : s.role === 'Admin' ? 'warning' : 'default'}>{s.role}</Badge></td>
-                  <td className="py-3 px-4">{s.robloxId}</td>
-                  <td className="py-3 px-4">
-                    <Button onClick={() => handleDelete(s.id)} variant="danger" size="sm">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input className="pl-9" placeholder="Search staff..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="flagged">Flagged</SelectItem>
+            <SelectItem value="suspended">Suspended</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-2">{Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}</div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground">
+          <p className="text-lg font-medium">No staff found</p>
+          <p className="text-sm mt-1">Try adjusting your search or add a new member.</p>
+        </div>
+      ) : (
+        <motion.div variants={STAGGER} initial="hidden" animate="show" className="space-y-2">
+          {filtered.map(s => (
+            <motion.div key={s.id} variants={FADE_UP}>
+              <Link href={`/staff/${s.id}`}>
+                <Card className="hover:bg-muted/10 transition-colors cursor-pointer">
+                  <CardContent className="p-4 flex items-center gap-4">
+                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary shrink-0">
+                      {s.robloxUsername.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm">{s.robloxUsername}</p>
+                        <StatusBadge status={s.status} />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{s.rank || s.role}</p>
+                    </div>
+                    <div className="hidden md:flex items-center gap-6 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" />{s.totalActivityMinutes}m</span>
+                      <span className="flex items-center gap-1.5"><ShieldAlert className="h-3 w-3" />{s.casesCount} cases</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
       )}
 
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add Staff Member">
-        <form onSubmit={handleAdd} className="space-y-4">
-          <Input
-            placeholder="Username"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
-            required
-          />
-          <Input
-            placeholder="Roblox ID"
-            type="number"
-            value={form.robloxId}
-            onChange={(e) => setForm({ ...form, robloxId: e.target.value })}
-            required
-          />
-          <Select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} required>
-            <option value="">Select Role</option>
-            <option value="Moderator">Moderator</option>
-            <option value="Admin">Admin</option>
-            <option value="Owner">Owner</option>
-          </Select>
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-            Add Staff Member
-          </Button>
-        </form>
-      </Modal>
-    </div>
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        {addOpen && <AddStaffDialog groupId={groupId} onClose={() => setAddOpen(false)} />}
+      </Dialog>
+    </motion.div>
   );
+}
+
+export default function StaffPage() {
+  return <GroupProvider><MainLayout><StaffContent /></MainLayout></GroupProvider>;
 }

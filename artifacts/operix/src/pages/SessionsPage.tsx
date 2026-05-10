@@ -1,122 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Modal } from '@/components/ui/Modal';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { EmptyState } from '@/components/ui/EmptyState';
-import { Badge } from '@/components/ui/Badge';
-import { Plus, Clock, X } from 'lucide-react';
-import { api } from '@/lib/api';
+import { GroupProvider, useGroupContext } from "@/lib/group-context";
+import { MainLayout } from "@/components/layout/main-layout";
+import { useListSessions, getListSessionsQueryKey } from "@workspace/api-client-react";
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Clock, User, Server } from "lucide-react";
 
-export default function SessionsPage() {
-  const { groupId } = useParams<{ groupId: string }>();
-  const [sessions, setSessions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [robloxId, setRobloxId] = useState('');
+const STAGGER = { hidden: {}, show: { transition: { staggerChildren: 0.04 } } };
+const FADE_UP = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
-  useEffect(() => {
-    api.sessions.list(groupId!).then(setSessions).finally(() => setLoading(false));
-  }, [groupId]);
+function SessionsContent() {
+  const { activeGroup } = useGroupContext();
+  const groupId = activeGroup?.id ?? 0;
 
-  const handleStart = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const newSession = await api.sessions.create(groupId!, { staffRobloxId: parseInt(robloxId) });
-      setSessions([...sessions, newSession]);
-      setRobloxId('');
-      setShowModal(false);
-    } catch (e: any) {
-      alert('Error: ' + e.message);
-    }
+  const { data: sessions = [], isLoading } = useListSessions(groupId, {}, {
+    query: { enabled: !!groupId, queryKey: getListSessionsQueryKey(groupId) }
+  });
+
+  const active = sessions.filter(s => s.active);
+  const history = sessions.filter(s => !s.active);
+
+  const formatDuration = (mins: number | null | undefined) => {
+    if (!mins) return "—";
+    if (mins < 60) return `${mins}m`;
+    return `${Math.floor(mins / 60)}h ${mins % 60}m`;
   };
-
-  const handleEnd = async (id: number) => {
-    try {
-      const updated = await api.sessions.end(groupId!, id);
-      setSessions(sessions.map((s) => (s.id === id ? updated : s)));
-    } catch (e: any) {
-      alert('Error: ' + e.message);
-    }
-  };
-
-  if (loading) return <LoadingSpinner />;
-
-  const active = sessions.filter((s) => !s.endedAt);
-  const ended = sessions.filter((s) => s.endedAt);
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Staff Sessions</h1>
-        <Button onClick={() => setShowModal(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Start Session
-        </Button>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Sessions</h1>
+        <p className="text-muted-foreground text-sm mt-1">{active.length} active · {history.length} historical</p>
       </div>
 
-      {sessions.length === 0 ? (
-        <Card>
-          <EmptyState icon={Clock} title="No sessions" description="Start a new staff session" />
-        </Card>
+      {isLoading ? (
+        <div className="space-y-2">{Array(6).fill(0).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}</div>
       ) : (
         <>
           {active.length > 0 && (
-            <>
-              <h2 className="text-xl font-semibold mb-4">Active Sessions</h2>
-              <div className="space-y-4 mb-8">
-                {active.map((s) => (
-                  <Card key={s.id}>
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <Badge variant="success" className="mb-2">
-                          ACTIVE
-                        </Badge>
-                        <p className="font-semibold">Staff ID: {s.staffRobloxId}</p>
-                        <p className="text-gray-400 text-sm">Started: {new Date(s.startedAt).toLocaleString()}</p>
-                      </div>
-                      <Button onClick={() => handleEnd(s.id)} variant="danger">
-                        <X className="w-4 h-4 mr-2" />
-                        End
-                      </Button>
-                    </div>
-                  </Card>
+            <div>
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Live Now</h2>
+              <motion.div variants={STAGGER} initial="hidden" animate="show" className="space-y-2">
+                {active.map(s => (
+                  <motion.div key={s.id} variants={FADE_UP}>
+                    <Card className="border-emerald-500/30 bg-emerald-500/5">
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                        <div className="flex-1 min-w-0 grid grid-cols-3 gap-4 text-sm">
+                          <div className="flex items-center gap-2 min-w-0"><User className="h-3.5 w-3.5 text-muted-foreground shrink-0" /><span className="font-medium truncate">{s.staffUsername || "Unknown"}</span></div>
+                          <div className="flex items-center gap-2 min-w-0"><Server className="h-3.5 w-3.5 text-muted-foreground shrink-0" /><span className="text-muted-foreground truncate">{s.serverName || "—"}</span></div>
+                          <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-muted-foreground" /><span className="text-muted-foreground">Started {new Date(s.startedAt).toLocaleTimeString()}</span></div>
+                        </div>
+                        <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shrink-0">Live</Badge>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
-              </div>
-            </>
+              </motion.div>
+            </div>
           )}
 
-          {ended.length > 0 && (
-            <>
-              <h2 className="text-xl font-semibold mb-4">Ended Sessions</h2>
-              <div className="space-y-4">
-                {ended.map((s) => (
-                  <Card key={s.id} className="opacity-75">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold">Staff ID: {s.staffRobloxId}</p>
-                        <p className="text-gray-400 text-sm">Started: {new Date(s.startedAt).toLocaleString()}</p>
-                        <p className="text-gray-400 text-sm">Ended: {new Date(s.endedAt).toLocaleString()}</p>
-                      </div>
-                    </div>
-                  </Card>
+          <div>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">History</h2>
+            {history.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">No session history yet</p>
+            ) : (
+              <motion.div variants={STAGGER} initial="hidden" animate="show" className="space-y-2">
+                {history.map(s => (
+                  <motion.div key={s.id} variants={FADE_UP}>
+                    <Card>
+                      <CardContent className="p-4 flex items-center gap-4">
+                        <div className="h-2.5 w-2.5 rounded-full bg-muted-foreground shrink-0" />
+                        <div className="flex-1 min-w-0 grid grid-cols-4 gap-4 text-sm">
+                          <div className="flex items-center gap-2 min-w-0"><User className="h-3.5 w-3.5 text-muted-foreground shrink-0" /><span className="font-medium truncate">{s.staffUsername || "Unknown"}</span></div>
+                          <div className="flex items-center gap-2 min-w-0"><Server className="h-3.5 w-3.5 text-muted-foreground shrink-0" /><span className="text-muted-foreground truncate">{s.serverName || "—"}</span></div>
+                          <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-muted-foreground" /><span className="text-muted-foreground">{formatDuration(s.durationMinutes)}</span></div>
+                          <div className="text-muted-foreground text-right">{new Date(s.startedAt).toLocaleDateString()}</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
-              </div>
-            </>
-          )}
+              </motion.div>
+            )}
+          </div>
         </>
       )}
-
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Start Session">
-        <form onSubmit={handleStart} className="space-y-4">
-          <Input placeholder="Staff Roblox ID" type="number" value={robloxId} onChange={(e) => setRobloxId(e.target.value)} required />
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-            Start Session
-          </Button>
-        </form>
-      </Modal>
-    </div>
+    </motion.div>
   );
+}
+
+export default function SessionsPage() {
+  return <GroupProvider><MainLayout><SessionsContent /></MainLayout></GroupProvider>;
 }
