@@ -1,5 +1,4 @@
-import { SignUpButton, SignInButton, UserButton, useAuth } from '@clerk/clerk-react'
-import { Button } from '@/components/ui/button'
+import { SignUpButton, SignInButton, useAuth } from '@clerk/clerk-react'
 
 export default function LandingPage() {
   const { isSignedIn } = useAuth()
@@ -21,14 +20,14 @@ export default function LandingPage() {
           </div>
           <div className="flex gap-4">
             <SignInButton mode="modal">
-              <Button variant="outline" className="border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6]/10">
+              <button className="px-4 py-2 border border-[#3b82f6] text-[#3b82f6] rounded-lg hover:bg-[#3b82f6]/10 transition">
                 Sign In
-              </Button>
+              </button>
             </SignInButton>
             <SignUpButton mode="modal" redirectUrl="/onboarding">
-              <Button className="bg-[#3b82f6] hover:bg-blue-600">
+              <button className="px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
                 Sign Up
-              </Button>
+              </button>
             </SignUpButton>
           </div>
         </div>
@@ -44,9 +43,9 @@ export default function LandingPage() {
         </p>
         <div className="flex gap-4 justify-center">
           <SignUpButton mode="modal" redirectUrl="/onboarding">
-            <Button className="bg-[#3b82f6] hover:bg-blue-600 px-8 py-6 text-lg">
+            <button className="px-8 py-6 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition text-lg font-semibold">
               Get Started Free
-            </Button>
+            </button>
           </SignUpButton>
         </div>
       </section>
@@ -83,7 +82,9 @@ export default function LandingPage() {
               <li>✓ Activity logging</li>
             </ul>
             <SignUpButton mode="modal" redirectUrl="/onboarding">
-              <Button className="w-full bg-[#3b82f6] hover:bg-blue-600">Get Started</Button>
+              <button className="w-full px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
+                Get Started
+              </button>
             </SignUpButton>
           </div>
           <div className="bg-[#0f1117] border border-[#3b82f6] rounded-lg p-8">
@@ -96,7 +97,9 @@ export default function LandingPage() {
               <li>✓ Priority support</li>
             </ul>
             <SignUpButton mode="modal" redirectUrl="/onboarding">
-              <Button className="w-full bg-[#3b82f6] hover:bg-blue-600">Upgrade to Pro</Button>
+              <button className="w-full px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
+                Upgrade to Pro
+              </button>
             </SignUpButton>
           </div>
         </div>
