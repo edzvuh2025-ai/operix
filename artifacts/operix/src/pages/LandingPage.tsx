@@ -1,168 +1,116 @@
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { ChevronRight, Activity, Shield, Zap, Workflow, Users, Key } from "lucide-react";
+import { SignUpButton, SignInButton, useAuth } from '@clerk/clerk-react'
 
 export default function LandingPage() {
-  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+  const { isSignedIn } = useAuth()
+
+  if (isSignedIn) {
+    // User is logged in, should have been redirected by App.tsx routing
+    // This shouldn't happen, but fallback to dashboard
+    window.location.href = '/dashboard'
+    return null
+  }
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#08090d] to-[#0f1117] text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full border-b border-white/5 bg-background/80 backdrop-blur-lg z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={`${basePath}/logo.svg`} alt="Operix" className="h-6" />
+      <nav className="border-b border-[#1e2028] backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+            Operix
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/sign-in" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Sign In
-            </Link>
-            <Link href="/sign-up" className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
-              Get Started
-            </Link>
+          <div className="flex gap-4">
+            <SignInButton mode="modal">
+              <button className="px-4 py-2 border border-[#3b82f6] text-[#3b82f6] rounded-lg hover:bg-[#3b82f6]/10 transition">
+                Sign In
+              </button>
+            </SignInButton>
+            <SignUpButton mode="modal" redirectUrl="/onboarding">
+              <button className="px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
+                Sign Up
+              </button>
+            </SignUpButton>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 px-6 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background -z-10" />
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm text-primary mb-8">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse" />
-              Operix AI Engine now in beta
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6">
-              The Operating System for <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">
-                Roblox Groups
-              </span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Precise, powerful, and commanding. Gain total control over your group's staff operations with AI-driven intelligence and automated workflows.
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <Link href="/sign-up" className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90">
-                Start Building <ChevronRight className="ml-2 h-4 w-4" />
-              </Link>
-              <Link href="#features" className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground">
-                Explore Features
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* Hero Image / Dashboard Mockup */}
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-16 relative mx-auto max-w-5xl rounded-xl border border-white/10 bg-card/50 shadow-2xl p-2 backdrop-blur-sm"
-          >
-            <div className="rounded-lg overflow-hidden border border-white/5 bg-background">
-              {/* Mockup Header */}
-              <div className="h-12 border-b border-white/5 flex items-center px-4 gap-2 bg-muted/30">
-                <div className="flex gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-red-500/80" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-                  <div className="h-3 w-3 rounded-full bg-green-500/80" />
-                </div>
-              </div>
-              {/* Mockup Body */}
-              <div className="p-6 grid grid-cols-3 gap-6 h-[400px]">
-                <div className="col-span-2 space-y-4">
-                  <div className="h-32 rounded-lg border border-white/5 bg-muted/20 p-4">
-                    <div className="h-4 w-32 bg-white/10 rounded mb-4" />
-                    <div className="flex items-end gap-4 h-16">
-                      <div className="w-8 bg-primary/40 rounded-t h-full" />
-                      <div className="w-8 bg-primary/60 rounded-t h-3/4" />
-                      <div className="w-8 bg-primary/80 rounded-t h-1/2" />
-                      <div className="w-8 bg-primary rounded-t h-full" />
-                      <div className="w-8 bg-primary/70 rounded-t h-5/6" />
-                    </div>
-                  </div>
-                  <div className="h-48 rounded-lg border border-white/5 bg-muted/20 p-4">
-                    <div className="h-4 w-24 bg-white/10 rounded mb-4" />
-                    <div className="space-y-3">
-                      <div className="h-8 bg-white/5 rounded w-full" />
-                      <div className="h-8 bg-white/5 rounded w-full" />
-                      <div className="h-8 bg-white/5 rounded w-3/4" />
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="h-full rounded-lg border border-white/5 bg-muted/20 p-4">
-                    <div className="h-4 w-40 bg-white/10 rounded mb-6" />
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <div className="h-8 w-8 rounded-full bg-blue-500/20 shrink-0" />
-                        <div className="space-y-2 w-full">
-                          <div className="h-3 bg-white/10 rounded w-full" />
-                          <div className="h-3 bg-white/10 rounded w-2/3" />
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="h-8 w-8 rounded-full bg-red-500/20 shrink-0" />
-                        <div className="space-y-2 w-full">
-                          <div className="h-3 bg-white/10 rounded w-full" />
-                          <div className="h-3 bg-white/10 rounded w-4/5" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Decorative Glow */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-blue-500/30 blur-2xl -z-10 opacity-50" />
-          </motion.div>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          The Operating System for <span className="text-[#3b82f6]">Roblox Groups</span>
+        </h1>
+        <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+          Manage your Roblox group with powerful tools for automation, analytics, and team collaboration
+        </p>
+        <div className="flex gap-4 justify-center">
+          <SignUpButton mode="modal" redirectUrl="/onboarding">
+            <button className="px-8 py-6 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition text-lg font-semibold">
+              Get Started Free
+            </button>
+          </SignUpButton>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 px-6 border-t border-white/5 bg-muted/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Command Center Capabilities</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Everything you need to scale your staff operations without losing control of quality or security.</p>
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-6">
+            <h3 className="text-xl font-bold mb-2">Team Management</h3>
+            <p className="text-gray-400">Manage roles, permissions, and team members efficiently</p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: Activity, title: "Live Activity Tracking", desc: "Monitor staff sessions, game presence, and actions in real-time. Never wonder who is active." },
-              { icon: Shield, title: "Case Management", desc: "A robust ticketing system for staff reports, evidence collection, and automated punishments." },
-              { icon: Zap, title: "AI-Powered Insights", desc: "Our engine automatically detects anomalies, suggests promotions, and flags inactivity." },
-              { icon: Workflow, title: "Automation Engine", desc: "Build visual rules to automatically demote inactive staff, or reward high performers." },
-              { icon: Users, title: "Staff Directory", desc: "A comprehensive database of all personnel with historical records, ranks, and performance scores." },
-              { icon: Key, title: "Enterprise Security", desc: "Role-based access control ensures your data is only visible to the right management tiers." }
-            ].map((feat, i) => (
-              <div key={i} className="rounded-xl border border-white/5 bg-card p-6 hover:bg-muted/30 transition-colors">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <feat.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{feat.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
-              </div>
-            ))}
+          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-6">
+            <h3 className="text-xl font-bold mb-2">Activity Logging</h3>
+            <p className="text-gray-400">Track all group activities with detailed audit logs</p>
+          </div>
+          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-6">
+            <h3 className="text-xl font-bold mb-2">Analytics</h3>
+            <p className="text-gray-400">Get insights into group performance and member engagement</p>
           </div>
         </div>
       </section>
-      
-      {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <img src={`${basePath}/logo.svg`} alt="Operix" className="h-5 grayscale opacity-50" />
+
+      {/* Pricing Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 className="text-3xl font-bold text-center mb-12">Pricing</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-[#0f1117] border border-[#1e2028] rounded-lg p-8">
+            <h3 className="text-2xl font-bold mb-4">Free</h3>
+            <p className="text-3xl font-bold text-[#3b82f6] mb-6">$0</p>
+            <ul className="space-y-3 text-gray-400 mb-8">
+              <li>✓ Basic group management</li>
+              <li>✓ Up to 5 team members</li>
+              <li>✓ Activity logging</li>
+            </ul>
+            <SignUpButton mode="modal" redirectUrl="/onboarding">
+              <button className="w-full px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
+                Get Started
+              </button>
+            </SignUpButton>
           </div>
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Operix. All rights reserved.</p>
+          <div className="bg-[#0f1117] border border-[#3b82f6] rounded-lg p-8">
+            <h3 className="text-2xl font-bold mb-4">Pro</h3>
+            <p className="text-3xl font-bold text-[#3b82f6] mb-6">$9.99<span className="text-lg text-gray-400">/month</span></p>
+            <ul className="space-y-3 text-gray-400 mb-8">
+              <li>✓ Everything in Free</li>
+              <li>✓ Unlimited team members</li>
+              <li>✓ Advanced analytics</li>
+              <li>✓ Priority support</li>
+            </ul>
+            <SignUpButton mode="modal" redirectUrl="/onboarding">
+              <button className="w-full px-4 py-2 bg-[#3b82f6] text-white rounded-lg hover:bg-blue-600 transition">
+                Upgrade to Pro
+              </button>
+            </SignUpButton>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-[#1e2028] py-8 mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+          <p>&copy; 2024 Operix. All rights reserved.</p>
         </div>
       </footer>
     </div>
-  );
+  )
 }
