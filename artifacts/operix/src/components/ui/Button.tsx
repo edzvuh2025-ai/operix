@@ -11,8 +11,8 @@ export function Button({ className, variant = 'primary', size = 'md', ...props }
     primary: 'bg-blue-600 hover:bg-blue-700',
     secondary: 'bg-[#1e2028] hover:bg-[#2d2e35]',
     danger: 'bg-red-600 hover:bg-red-700',
-    ghost: 'hover:bg-slate-800 hover:bg-opacity-50',
-    outline: 'border border-slate-600 hover:bg-slate-800 hover:bg-opacity-50',
+    ghost: 'hover:bg-slate-800/50',
+    outline: 'border border-slate-600 hover:bg-slate-800/50',
   };
   const sizes = {
     sm: 'px-2 py-1 text-sm',

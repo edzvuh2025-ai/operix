@@ -32,7 +32,7 @@ export default function LandingPage() {
               </Button>
             </SignInButton>
             <SignUpButton mode="modal" afterSignUpUrl="/app/onboarding">
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button variant="primary">
                 Get Started
               </Button>
             </SignUpButton>
@@ -52,11 +52,11 @@ export default function LandingPage() {
           </p>
           <div className="flex gap-4 justify-center">
             <SignUpButton mode="modal" afterSignUpUrl="/app/onboarding">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
+              <Button size="lg" variant="primary" className="text-white px-8">
                 Start Free
               </Button>
             </SignUpButton>
-            <Button size="lg" variant="outline" className="border-slate-600 text-white hover:bg-slate-800 px-8">
+            <Button size="lg" variant="outline" className="text-white px-8">
               Learn More
             </Button>
           </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
             Join thousands of Roblox group managers using Operix to streamline their operations.
           </p>
           <SignUpButton mode="modal" afterSignUpUrl="/app/onboarding">
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
+            <Button size="lg" variant="primary" className="text-white px-8">
               Get Started Free
             </Button>
           </SignUpButton>
