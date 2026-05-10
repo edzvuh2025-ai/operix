@@ -2,17 +2,10 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "dockerfile",
-    "context": ".",
-    "args": {
-      "VITE_CLERK_PUBLISHABLE_KEY": "${{ env.VITE_CLERK_PUBLISHABLE_KEY }}",
-      "VITE_CLERK_PROXY_URL": "${{ env.VITE_CLERK_PROXY_URL }}"
+    "buildArgs": {
+      "VITE_CLERK_PUBLISHABLE_KEY": "${VITE_CLERK_PUBLISHABLE_KEY}",
+      "AI_INTEGRATIONS_OPENAI_BASE_URL": "${AI_INTEGRATIONS_OPENAI_BASE_URL}",
+      "AI_INTEGRATIONS_OPENAI_API_KEY": "${AI_INTEGRATIONS_OPENAI_API_KEY}"
     }
-  },
-  "deploy": {
-    "startCommand": "pnpm start",
-    "restartPolicyCondition": "on-failure",
-    "restartPolicyMaxRetries": 3,
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 30
   }
 }

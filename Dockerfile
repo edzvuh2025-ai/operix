@@ -9,9 +9,18 @@ RUN npm install -g pnpm@10
 # Install dependencies
 RUN pnpm install --no-frozen-lockfile
 
-# Build (env vars from Railway's build context)
+# Accept build args and set as env for build
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ARG AI_INTEGRATIONS_OPENAI_BASE_URL
+ARG AI_INTEGRATIONS_OPENAI_API_KEY
+
+ENV VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+ENV AI_INTEGRATIONS_OPENAI_BASE_URL=${AI_INTEGRATIONS_OPENAI_BASE_URL}
+ENV AI_INTEGRATIONS_OPENAI_API_KEY=${AI_INTEGRATIONS_OPENAI_API_KEY}
 ENV NODE_ENV=production
+
+# Build (env vars now available)
 RUN pnpm build
 
-# Start the API server (which serves frontend)
+# Start the API server
 CMD ["pnpm", "--filter=@operix/api-server", "start"]
