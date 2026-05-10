@@ -19,8 +19,11 @@ COPY package.json pnpm-workspace.yaml ./
 COPY lib ./lib
 COPY artifacts ./artifacts
 
-# Install dependencies with --no-frozen-lockfile to allow pnpm to generate lock file
-RUN pnpm install --no-frozen-lockfile
+# Install dependencies without running build scripts first
+RUN pnpm install --no-frozen-lockfile --no-scripts
+
+# Allow build scripts and rebuild
+RUN pnpm rebuild
 
 # Build the database migrations
 RUN pnpm -F @operix/db run build
